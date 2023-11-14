@@ -1,19 +1,17 @@
 // @ts-check
 /** @typedef {import("./types").GistsGetResponse} GistsGetResponse */
-// @ts-ignore
-/** @typedef {import("ky").KyInstance} KyInstance */
 
+const f = require("./fetch");
 const shelljs = require("shelljs");
 const os = require("os");
 const vscode = require("vscode");
+
+const outputChannel = vscode.window.createOutputChannel("Code-Server Sync");
 
 const settingsDIR = `${os.homedir()}/.local/share/code-server/User`;
 const config = vscode.workspace.getConfiguration("sync");
 const gistsID = config.get("GistsID");
 const githubToken = config.get("GithubToken");
-
-/** @type {KyInstance} */
-let ky;
 
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
@@ -23,22 +21,24 @@ let ky;
 
 async function updateGists() {
   const url = `https://api.github.com/gists/${gistsID}`;
-  // console.log(gistsID);
-  // console.log(githubToken);
+  outputChannel.appendLine(url);
+  outputChannel.appendLine(gistsID);
+  outputChannel.appendLine(githubToken);
 
   const settings = shelljs.cat(`${settingsDIR}/settings.json`);
   const keybindings = shelljs.cat(`${settingsDIR}/keybindings.json`);
   const snippets = shelljs.cat(`${settingsDIR}/snippets/global.code-snippets`);
   const extensions = getAllExtension();
 
-  const res = await ky
-    .patch(url, {
+  const res = await (
+    await f.fetch(url, {
+      method: "PATCH",
       headers: {
         Authorization: `Bearer ${githubToken}`,
         "X-GitHub-Api-Version": "2022-11-28",
         Accept: "application/vnd.github+json",
       },
-      json: {
+      body: JSON.stringify({
         description: "An updated gist description",
         files: {
           "settings.json": { content: settings },
@@ -46,25 +46,27 @@ async function updateGists() {
           "keybindings.json": { content: keybindings },
           "extensions.json": { content: JSON.stringify(extensions) },
         },
-      },
+      }),
     })
-    .json();
-  // console.log(res);
+  ).json();
+
+  outputChannel.appendLine(JSON.stringify(res, null, 2));
 
   vscode.window.showInformationMessage("Settings uploaded successfully");
 }
 
 async function downloadSettings() {
   /** @type {GistsGetResponse} */
-  const gists = await ky
-    .get(`https://api.github.com/gists/${gistsID}`, {
+  const gists = await (
+    await f.fetch(`https://api.github.com/gists/${gistsID}`, {
+      method: "GET",
       headers: {
         Accept: "application/vnd.github+json",
         Authorization: `Bearer ${githubToken}`,
         "X-GitHub-Api-Version": "2022-11-28",
       },
     })
-    .json();
+  ).json();
 
   const files = gists.files;
 
@@ -130,7 +132,6 @@ async function installExtension(extensionId) {
  */
 async function activate(context) {
   console.log('Congratulations,aaa your extension "sync" is now active!');
-  ky = (await import("ky")).default;
 
   let command1 = vscode.commands.registerCommand(
     "sync.downloadSettings",
