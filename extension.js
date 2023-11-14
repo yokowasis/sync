@@ -24,6 +24,7 @@ async function updateGists() {
   const settings = shelljs.cat(`${settingsDIR}/settings.json`);
   const keybindings = shelljs.cat(`${settingsDIR}/keybindings.json`);
   const snippets = shelljs.cat(`${settingsDIR}/snippets/global.code-snippets`);
+  const extensions = getAllExtension();
 
   const res = await ky
     .patch(url, {
@@ -38,6 +39,7 @@ async function updateGists() {
           "settings.json": { content: settings },
           "snippets.json": { content: snippets },
           "keybindings.json": { content: keybindings },
+          "extensions.json": { content: JSON.stringify(extensions) },
         },
       },
     })
@@ -51,6 +53,40 @@ async function downloadSettings() {
   shelljs.ShellString(s).to(`${settingsDIR}/settings.json`);
 }
 
+function getAllExtension() {
+  const allExtensions = vscode.extensions.all;
+
+  /** @type {string[]} */
+  const extensions = [];
+
+  for (const ex of allExtensions) {
+    if (
+      ex.packageJSON.publisher === "vscode" ||
+      ex.packageJSON.publisher === "ms-vscode"
+    )
+      continue;
+    extensions.push(`${ex.packageJSON.publisher}.${ex.packageJSON.name}`);
+  }
+  return extensions;
+}
+
+/**
+ *
+ * @param {string} extensionId
+ */
+async function installExtension(extensionId) {
+  try {
+    // Trigger the 'workbench.extensions.installExtension' command
+    await vscode.commands.executeCommand(
+      "workbench.extensions.installExtension",
+      extensionId
+    );
+    console.log(`Extension ${extensionId} installed successfully.`);
+  } catch (error) {
+    console.error(`Error installing extension ${extensionId}: ${error}`);
+  }
+}
+
 /**
  * @param {vscode.ExtensionContext} context
  */
@@ -59,6 +95,8 @@ async function activate(context) {
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations,aaa your extension "sync" is now active!');
   // downloadSettings();
+  //   updateGists();
+
   updateGists();
 
   // console.log(gistsID);
