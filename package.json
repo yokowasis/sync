@@ -9,13 +9,32 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "sync.helloWorld",
-      "title": "Hello World"
-    }]
+    "configuration": {
+      "title": "Code GPT",
+      "properties": {
+        "sync.GistsID": {
+          "title": "Gists ID",
+          "type": "string",
+          "description": "Gists ID to sync with"
+        },
+        "sync.GithubToken": {
+          "title": "Github User Token",
+          "type": "string",
+          "description": "Github User Token to sync with"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "sync.helloWorld",
+        "title": "Hello World"
+      }
+    ]
   },
   "scripts": {
     "lint": "eslint .",
@@ -23,13 +42,16 @@
     "test": "node ./test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.84.0",
     "@types/mocha": "^10.0.3",
     "@types/node": "18.x",
+    "@types/vscode": "^1.84.0",
+    "@vscode/test-electron": "^2.3.6",
     "eslint": "^8.52.0",
     "glob": "^10.3.10",
     "mocha": "^10.2.0",
-    "typescript": "^5.2.2",
-    "@vscode/test-electron": "^2.3.6"
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "shelljs": "^0.8.5"
   }
 }
