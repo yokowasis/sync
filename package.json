@@ -1,64 +1,60 @@
 {
-  "name": "sync",
-  "publisher": "yokowasis",
-  "displayName": "sync",
-  "description": "Add Syncronization to Code-server",
-  "icon": "icon2.jpeg",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.84.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onStartupFinished"
-  ],
-  "main": "./extension.js",
-  "contributes": {
-    "configuration": {
-      "title": "Code GPT",
-      "properties": {
-        "sync.GistsID": {
-          "title": "Gists ID",
-          "type": "string",
-          "description": "Gists ID to sync with"
-        },
-        "sync.GithubToken": {
-          "title": "Github User Token",
-          "type": "string",
-          "description": "Github User Token to sync with"
-        }
-      }
+    "name": "sync",
+    "publisher": "yokowasis",
+    "displayName": "sync",
+    "description": "Add Syncronization to Code-server",
+    "icon": "icon2.jpeg",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yokowasis/sync"
     },
-    "commands": [
-      {
-        "command": "sync.downloadSettings",
-        "title": "code-server Sync : Download Settings"
-      },
-      {
-        "command": "sync.uploadSettings",
-        "title": "code-server Sync : Upload Settings"
-      }
-    ]
-  },
-  "scripts": {
-    "lint": "eslint .",
-    "pretest": "pnpm run lint",
-    "test": "node ./test/runTest.js"
-  },
-  "devDependencies": {
-    "@types/mocha": "^10.0.3",
-    "@types/node": "18.x",
-    "@types/vscode": "^1.84.0",
-    "@vscode/test-electron": "^2.3.6",
-    "eslint": "^8.52.0",
-    "glob": "^10.3.10",
-    "mocha": "^10.2.0",
-    "typescript": "^5.2.2"
-  },
-  "dependencies": {
-    "ky": "^1.1.3",
-    "shelljs": "^0.8.5"
-  }
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.84.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+        "configuration": {
+            "title": "Code GPT",
+            "properties": {
+                "sync.GistsID": {
+                    "title": "Gists ID",
+                    "type": "string",
+                    "description": "Gists ID to sync with"
+                },
+                "sync.GithubToken": {
+                    "title": "Github User Token",
+                    "type": "string",
+                    "description": "Github User Token to sync with"
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "sync.downloadSettings",
+                "title": "code-server Sync : Download Settings"
+            },
+            {
+                "command": "sync.uploadSettings",
+                "title": "code-server Sync : Upload Settings"
+            }
+        ]
+    },
+    "scripts": {
+        "lint": "eslint .",
+        "pretest": "pnpm run lint",
+        "test": "node ./test/runTest.js"
+    },
+    "devDependencies": {},
+    "dependencies": {
+        "ky": "^1.1.3",
+        "shelljs": "^0.8.5"
+    },
+    "license": "MIT"
 }
