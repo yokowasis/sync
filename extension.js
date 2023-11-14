@@ -1,4 +1,7 @@
 // @ts-check
+/** @typedef {import("./types").GistsGetResponse} GistsGetResponse */
+// @ts-ignore
+/** @typedef {import("ky").KyInstance} KyInstance */
 
 const shelljs = require("shelljs");
 const os = require("os");
@@ -9,6 +12,9 @@ const config = vscode.workspace.getConfiguration("sync");
 const gistsID = config.get("GistsID");
 const githubToken = config.get("GithubToken");
 
+/** @type {KyInstance} */
+let ky;
+
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 
@@ -16,7 +22,6 @@ const githubToken = config.get("GithubToken");
 // Your extension is activated the very first time the command is executed
 
 async function updateGists() {
-  const ky = (await import("ky")).default;
   const url = `https://api.github.com/gists/${gistsID}`;
   console.log(gistsID);
   console.log(githubToken);
@@ -48,9 +53,34 @@ async function updateGists() {
 }
 
 async function downloadSettings() {
-  const gistsURL = `https://gist.githubusercontent.com/yokowasis/${gistsID}/raw/settings.json`;
-  const s = await (await fetch(gistsURL)).text();
-  shelljs.ShellString(s).to(`${settingsDIR}/settings.json`);
+  /** @type {GistsGetResponse} */
+  const gists = await ky
+    .get(`https://api.github.com/gists/${gistsID}`, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${githubToken}`,
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    })
+    .json();
+
+  const files = gists.files;
+
+  const settings = files["settings.json"].content;
+  const keybindings = files["keybindings.json"].content;
+  const snippets = files["snippets.json"].content;
+  const extensions = JSON.parse(files["extensions.json"].content);
+
+  shelljs.ShellString(settings).to(`${settingsDIR}/settings.json`);
+  shelljs.ShellString(keybindings).to(`${settingsDIR}/keybindings.json`);
+  shelljs.mkdir(`${settingsDIR}/snippets`);
+  shelljs
+    .ShellString(snippets)
+    .to(`${settingsDIR}/snippets/global.code-snippets`);
+
+  for (const extension of extensions) {
+    installExtension(extension);
+  }
 }
 
 function getAllExtension() {
@@ -91,13 +121,11 @@ async function installExtension(extensionId) {
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
   console.log('Congratulations,aaa your extension "sync" is now active!');
-  // downloadSettings();
-  //   updateGists();
+  ky = (await import("ky")).default;
 
-  updateGists();
+  //   downloadSettings();
+  //   updateGists();
 
   // console.log(gistsID);
   // console.log(githubToken);
