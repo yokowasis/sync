@@ -23,8 +23,8 @@ let ky;
 
 async function updateGists() {
   const url = `https://api.github.com/gists/${gistsID}`;
-  console.log(gistsID);
-  console.log(githubToken);
+  // console.log(gistsID);
+  // console.log(githubToken);
 
   const settings = shelljs.cat(`${settingsDIR}/settings.json`);
   const keybindings = shelljs.cat(`${settingsDIR}/keybindings.json`);
@@ -49,7 +49,9 @@ async function updateGists() {
       },
     })
     .json();
-  console.log(res);
+  // console.log(res);
+
+  vscode.window.showInformationMessage("Settings uploaded successfully");
 }
 
 async function downloadSettings() {
@@ -78,9 +80,15 @@ async function downloadSettings() {
     .ShellString(snippets)
     .to(`${settingsDIR}/snippets/global.code-snippets`);
 
+  const promises = [];
+
   for (const extension of extensions) {
-    installExtension(extension);
+    promises.push(installExtension(extension));
   }
+
+  Promise.allSettled(promises).then(() => {
+    vscode.window.showInformationMessage("Settings downloaded successfully");
+  });
 }
 
 function getAllExtension() {
