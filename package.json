@@ -52,6 +52,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "ky": "^1.1.3",
     "shelljs": "^0.8.5"
   }
 }

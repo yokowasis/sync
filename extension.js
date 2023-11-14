@@ -1,3 +1,5 @@
+// @ts-check
+
 const shelljs = require("shelljs");
 const os = require("os");
 const vscode = require("vscode");
@@ -13,6 +15,36 @@ const githubToken = config.get("GithubToken");
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 
+async function updateGists() {
+  const ky = (await import("ky")).default;
+  const url = `https://api.github.com/gists/${gistsID}`;
+  console.log(gistsID);
+  console.log(githubToken);
+
+  const settings = shelljs.cat(`${settingsDIR}/settings.json`);
+  const keybindings = shelljs.cat(`${settingsDIR}/keybindings.json`);
+  const snippets = shelljs.cat(`${settingsDIR}/snippets/global.code-snippets`);
+
+  const res = await ky
+    .patch(url, {
+      headers: {
+        Authorization: `Bearer ${githubToken}`,
+        "X-GitHub-Api-Version": "2022-11-28",
+        Accept: "application/vnd.github+json",
+      },
+      json: {
+        description: "An updated gist description",
+        files: {
+          "settings.json": { content: settings },
+          "snippets.json": { content: snippets },
+          "keybindings.json": { content: keybindings },
+        },
+      },
+    })
+    .json();
+  console.log(res);
+}
+
 async function downloadSettings() {
   const gistsURL = `https://gist.githubusercontent.com/yokowasis/${gistsID}/raw/settings.json`;
   const s = await (await fetch(gistsURL)).text();
@@ -25,10 +57,12 @@ async function downloadSettings() {
 async function activate(context) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "sync" is now active!');
+  console.log('Congratulations,aaa your extension "sync" is now active!');
+  // downloadSettings();
+  updateGists();
 
-  console.log(gistsID);
-  console.log(githubToken);
+  // console.log(gistsID);
+  // console.log(githubToken);
 
   // console.log(shelljs.cat(`${settingsDIR}/settings.json`));
 
