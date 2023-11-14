@@ -124,28 +124,18 @@ async function activate(context) {
   console.log('Congratulations,aaa your extension "sync" is now active!');
   ky = (await import("ky")).default;
 
-  //   downloadSettings();
-  //   updateGists();
-
-  // console.log(gistsID);
-  // console.log(githubToken);
-
-  // console.log(shelljs.cat(`${settingsDIR}/settings.json`));
-
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with  registerCommand
-  // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand(
-    "sync.helloWorld",
-    function () {
-      // The code you place here will be executed every time your command is executed
-
-      // Display a message box to the user
-      vscode.window.showInformationMessage("Hello World from sync!");
-    }
+  let command1 = vscode.commands.registerCommand(
+    "sync.downloadSettings",
+    downloadSettings
   );
 
-  context.subscriptions.push(disposable);
+  let command2 = vscode.commands.registerCommand(
+    "sync.uploadSettings",
+    updateGists
+  );
+
+  context.subscriptions.push(command1);
+  context.subscriptions.push(command2);
 }
 
 // This method is called when your extension is deactivated

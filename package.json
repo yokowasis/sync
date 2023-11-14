@@ -1,7 +1,9 @@
 {
   "name": "sync",
+  "publisher": "yokowasis",
   "displayName": "sync",
   "description": "Add Syncronization to Code-server",
+  "icon": "icon2.jpeg",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.84.0"
@@ -31,8 +33,12 @@
     },
     "commands": [
       {
-        "command": "sync.helloWorld",
-        "title": "Hello World"
+        "command": "sync.downloadSettings",
+        "title": "code-server Sync : Download Settings"
+      },
+      {
+        "command": "sync.uploadSettings",
+        "title": "code-server Sync : Upload Settings"
       }
     ]
   },
