@@ -4,11 +4,17 @@
 const f = require("./fetch");
 const shelljs = require("shelljs");
 const os = require("os");
+const currentOS = os.platform();
 const vscode = require("vscode");
 
 const outputChannel = vscode.window.createOutputChannel("Code-Server Sync");
 
-const settingsDIR = `${os.homedir()}/.local/share/code-server/User`;
+let settingsDIR = "";
+if (currentOS === "win32") {
+  settingsDIR = `${os.homedir()}\\AppData\\Roaming\\Code\\User`;
+} else {
+  settingsDIR = `${os.homedir()}/.local/share/code-server/User`;
+}
 const config = vscode.workspace.getConfiguration("sync");
 const gistsID = config.get("GistsID");
 const githubToken = config.get("GithubToken");
@@ -57,16 +63,18 @@ async function updateGists() {
 
 async function downloadSettings() {
   /** @type {GistsGetResponse} */
-  const gists = await (
-    await f.fetch(`https://api.github.com/gists/${gistsID}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${githubToken}`,
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    })
-  ).json();
+  const gists = /** @type {*} */ (
+    await (
+      await f.fetch(`https://api.github.com/gists/${gistsID}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/vnd.github+json",
+          Authorization: `Bearer ${githubToken}`,
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      })
+    ).json()
+  );
 
   const files = gists.files;
 
