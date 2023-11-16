@@ -11,7 +11,7 @@ const outputChannel = vscode.window.createOutputChannel("Code-Server Sync");
 
 let settingsDIR = "";
 if (currentOS === "win32") {
-  settingsDIR = `${os.homedir()}\\AppData\\Roaming\\Code\\User`;
+  settingsDIR = `${os.homedir()}\\AppData\\Local\\code-server\\Data\\User`;
 } else {
   settingsDIR = `${os.homedir()}/.local/share/code-server/User`;
 }
