@@ -8,7 +8,7 @@
         "type": "git",
         "url": "https://github.com/yokowasis/sync"
     },
-    "version": "0.0.8",
+    "version": "0.0.9",
     "engines": {
         "vscode": "^1.60.0"
     },
@@ -30,6 +30,14 @@
                     "title": "Github User Token",
                     "type": "string",
                     "description": "Github User Token to sync with"
+                },
+                "sync.excludedExtensions": {
+                    "title": "Excluded Extensions",
+                    "type": "array",
+                    "description": "Extensions to exclude from sync. Use extensions id, e.g. ms-python.python",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
