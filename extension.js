@@ -11,13 +11,27 @@ const outputChannel = vscode.window.createOutputChannel("Code-Server Sync");
 
 let settingsDIR = "";
 if (currentOS === "win32") {
+  const paths = [
+    `${os.homedir()}\\AppData\\Local\\code-server\\Data\\User\\settings.json`,
+    `${os.homedir()}\\AppData\\Roaming\\Code\\User\\settings.json`,
+  ];
+
   settingsDIR = `${os.homedir()}\\AppData\\Local\\code-server\\Data\\User`;
+
+  // check which path exists
+  for (const path of paths) {
+    if (shelljs.test("-f", path)) {
+      settingsDIR = path.replace(`\\settings.json`, "");
+      break;
+    }
+  }
 } else {
   settingsDIR = `${os.homedir()}/.local/share/code-server/User`;
 }
 const config = vscode.workspace.getConfiguration("sync");
 const gistsID = config.get("GistsID");
 const githubToken = config.get("GithubToken");
+const excludedExtension = config.get("excludedExtensions");
 
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
@@ -34,7 +48,11 @@ async function updateGists() {
   const settings = shelljs.cat(`${settingsDIR}/settings.json`);
   const keybindings = shelljs.cat(`${settingsDIR}/keybindings.json`);
   const snippets = shelljs.cat(`${settingsDIR}/snippets/global.code-snippets`);
-  const extensions = getAllExtension();
+  let extensions = getAllExtension();
+
+  extensions = extensions.filter(
+    (extension) => !excludedExtension.includes(extension)
+  );
 
   const res = await (
     await f.fetch(url, {
