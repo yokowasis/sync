@@ -9,25 +9,24 @@ const vscode = require("vscode");
 
 const outputChannel = vscode.window.createOutputChannel("Code-Server Sync");
 
+const paths = [
+  `${os.homedir()}\\AppData\\Local\\code-server\\Data\\User\\`,
+  `${os.homedir()}/.local/share/code-server/User`,
+  `${os.homedir()}/Library/Application Support/VSCodium/User/`,
+];
+
 let settingsDIR = "";
-if (currentOS === "win32") {
-  const paths = [
-    `${os.homedir()}\\AppData\\Local\\code-server\\Data\\User\\settings.json`,
-    `${os.homedir()}\\AppData\\Roaming\\Code\\User\\settings.json`,
-  ];
 
-  settingsDIR = `${os.homedir()}\\AppData\\Local\\code-server\\Data\\User`;
-
-  // check which path exists
-  for (const path of paths) {
-    if (shelljs.test("-f", path)) {
-      settingsDIR = path.replace(`\\settings.json`, "");
-      break;
-    }
+// find which path exists
+for (const path of paths) {
+  if (shelljs.test("-d", path)) {
+    settingsDIR = path;
+    break;
   }
-} else {
-  settingsDIR = `${os.homedir()}/.local/share/code-server/User`;
 }
+
+console.log(settingsDIR);
+
 const config = vscode.workspace.getConfiguration("sync");
 const gistsID = config.get("GistsID");
 const githubToken = config.get("GithubToken");
