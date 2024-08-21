@@ -11,8 +11,11 @@ const outputChannel = vscode.window.createOutputChannel("Code-Server Sync");
 
 const paths = [
   `${os.homedir()}\\AppData\\Local\\code-server\\Data\\User\\`,
+  `${os.homedir()}\\AppData\\Roaming\\VSCodium\\User\\`,
   `${os.homedir()}/.local/share/code-server/User`,
   `${os.homedir()}/Library/Application Support/VSCodium/User/`,
+  `${os.homedir()}/Library/Application Support/VSCodium/User/`,
+  
 ];
 
 let settingsDIR = "";
