@@ -8,7 +8,7 @@
         "type": "git",
         "url": "https://github.com/yokowasis/sync"
     },
-    "version": "0.1.1",
+    "version": "0.1.2",
     "engines": {
         "vscode": "^1.60.0"
     },
@@ -45,6 +45,10 @@
             {
                 "command": "sync.downloadSettings",
                 "title": "code-server Sync : Download Settings"
+            },
+            {
+                "command": "sync.downloadExtensions",
+                "title": "code-server Sync : Download Extensions"
             },
             {
                 "command": "sync.uploadSettings",

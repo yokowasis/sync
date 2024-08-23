@@ -15,7 +15,6 @@ const paths = [
   `${os.homedir()}/.local/share/code-server/User`,
   `${os.homedir()}/Library/Application Support/VSCodium/User/`,
   `${os.homedir()}/Library/Application Support/VSCodium/User/`,
-  
 ];
 
 let settingsDIR = "";
@@ -81,6 +80,36 @@ async function updateGists() {
   vscode.window.showInformationMessage("Settings uploaded successfully");
 }
 
+async function downloadExtensions() {
+  /** @type {GistsGetResponse} */
+  const gists = /** @type {*} */ (
+    await (
+      await f.fetch(`https://api.github.com/gists/${gistsID}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/vnd.github+json",
+          Authorization: `Bearer ${githubToken}`,
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      })
+    ).json()
+  );
+
+  const files = gists.files;
+
+  const extensions = JSON.parse(files["extensions.json"].content);
+
+  const promises = [];
+
+  for (const extension of extensions) {
+    promises.push(installExtension(extension));
+  }
+
+  Promise.allSettled(promises).then(() => {
+    vscode.window.showInformationMessage("Extensions downloaded successfully");
+  });
+}
+
 async function downloadSettings() {
   /** @type {GistsGetResponse} */
   const gists = /** @type {*} */ (
@@ -101,7 +130,6 @@ async function downloadSettings() {
   const settings = files["settings.json"].content;
   const keybindings = files["keybindings.json"].content;
   const snippets = files["snippets.json"].content;
-  const extensions = JSON.parse(files["extensions.json"].content);
 
   shelljs.ShellString(settings).to(`${settingsDIR}/settings.json`);
   shelljs.ShellString(keybindings).to(`${settingsDIR}/keybindings.json`);
@@ -111,10 +139,6 @@ async function downloadSettings() {
     .to(`${settingsDIR}/snippets/global.code-snippets`);
 
   const promises = [];
-
-  for (const extension of extensions) {
-    promises.push(installExtension(extension));
-  }
 
   Promise.allSettled(promises).then(() => {
     vscode.window.showInformationMessage("Settings downloaded successfully");
@@ -169,6 +193,11 @@ async function activate(context) {
   let command2 = vscode.commands.registerCommand(
     "sync.uploadSettings",
     updateGists
+  );
+
+  let command3 = vscode.commands.registerCommand(
+    "sync.downloadExtensions",
+    downloadExtensions
   );
 
   context.subscriptions.push(command1);
